@@ -11,7 +11,7 @@ class FGO(commands.Cog):
 ###############################################################################   
 ###https://api.atlasacademy.io/rapidoc
 
-    @commands.command(name='Servant', help = 'Pesquisa dados de um servo')
+    @commands.command(name='Servant', help = 'Pesquisa dados de um servo\n[name...] é o nome do servo.')
     async def searchServant(self,ctx, *name):
     ##Functions###################
         ##Checks if the message is valid

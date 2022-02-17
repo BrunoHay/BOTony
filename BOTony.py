@@ -1,4 +1,5 @@
-
+# import nest_asyncio
+# nest_asyncio.apply()
 from discord.ext import commands
 from decouple import config
 import os
@@ -19,4 +20,5 @@ load_cogs(bot)
 
 
 TOKEN = config('TOKEN')
+TOKEN_TESTES = config('TOKEN_TESTES')
 bot.run(TOKEN)
