@@ -1,5 +1,5 @@
 from discord.ext import commands
-from BOTony_v01 import sign
+from BOTony import sign
 class Utility(commands.Cog):
     ''' Utilities to help you '''
     
