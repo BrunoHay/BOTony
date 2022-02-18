@@ -1,10 +1,5 @@
 from discord.ext import commands
 import random
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
 
 class Games(commands.Cog):
     ''' Silly games support '''
@@ -44,37 +39,7 @@ class Games(commands.Cog):
         await ctx.send(response)
 
  
-    @commands.command(name='letsPlay', help = 'Cria salas online para jogar certos jogos. \n<game> é o nome do jogo.')
-    async def newRoom(self, ctx, game):
 
-        games = {'Broken Picture Phone':('https://www.brokenpicturephone.com/?room=manjuba',None),
-                 'Colonist':('https://colonist.io/', 
-                                     '//*[@id="landingpage_enter_lobby_button"]', 
-                                     '//*[@id="lobby_cta_create"]', 
-                                     '//*[@id="room_center_checkbox_privategame"]'),
-                 'Codenames':('https://codenames.game/', None)}
-        ##Se o jogo n estiver no catalogo
-        if not game in games:
-            await ctx.send('Não encontrei este jogo no meu catálogo. Por favor escolha um dentre os seguintes:')
-            response =''
-            for name in games:
-                response += f'\n{name}'
-            await ctx.send(response)
-        else:
-            ##Se o jogo não precisa criar uma nova sala
-            if games[game][1]==None:
-                await ctx.send(f'Aqui está o link!{games[game]}')
-            else:
-                ##Cria nova sala clicando nos botoes estipulados
-                driver = webdriver.Chrome()
-                driver.get(games[game][0])
-    
-                for i in range(1,len(games[game])):
-                    time.sleep(1)
-                    elemento = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,games[game][i])))
-                    elemento.click()
-                await ctx.send(f'Aqui está o link!{driver.current_url}')
-                driver.quit()
 
     
 def setup(bot):
