@@ -3,4 +3,3 @@ requests
 python-decouple
 asyncio
 selenium
-random
