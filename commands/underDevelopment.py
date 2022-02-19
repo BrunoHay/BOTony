@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import requests
+import asyncio
 
 class UnderDevelopment(commands.Cog):
     ''' Still under development '''
@@ -12,68 +14,15 @@ class UnderDevelopment(commands.Cog):
     
     def __init__(self, bot):
         self.bot = bot
-#####Plays music
-    @commands.command(name='play', help = 'toca a música')
-    async def play(self, ctx):
-        players = {}
-        try:
-            yt_url = ctx.message.content[6:]
-            if self.bot.is_voice_connected(ctx.voice_client):
-                try:
-                    #voice = self.bot.voice_client_in(ctx.voice_client)
-                    voice = ctx.voice_client
-                    players[ctx].stop()
-                    player = await voice.create_ytdl_player('ytsearch: {}'.format(yt_url))
-                    players[ctx] = player
-                    player.start()
-                    mscemb = discord.Embed(
-                        title="Música para tocar:",
-                        color=0xF7FE2E
-                    )
-                    mscemb.add_field(name="Nome:", value="`{}`".format(player.title))
-                    mscemb.add_field(name="Visualizações:", value="`{}`".format(player.views))
-                    mscemb.add_field(name="Enviado em:", value="`{}`".format(player.uploaded_date))
-                    mscemb.add_field(name="Enviado por:", value="`{}`".format(player.uploadeder))
-                    mscemb.add_field(name="Duraçao:", value="`{}`".format(player.uploadeder))
-                    mscemb.add_field(name="Likes:", value="`{}`".format(player.likes))
-                    mscemb.add_field(name="Deslikes:", value="`{}`".format(player.dislikes))
-                    await ctx.send(embed=mscemb)
-                except Exception as e:
-                    await ctx.send("Error1: [{error}]".format(error=e))
-
-            if not self.bot.is_voice_connected(ctx.voice_client):
-                try:
-                    channel = ctx.author.voice.channel
-                    voice = await channel.connect() 
-                    player = await voice.create_ytdl_player('ytsearch: {}'.format(yt_url))
-                    players[ctx] = player
-                    player.start()
-                    mscemb2 = discord.Embed(
-                        title="Música para tocar:",
-                        color=0xF7FE2E
-                    )
-                    mscemb2.add_field(name="Nome:", value="`{}`".format(player.title))
-                    mscemb2.add_field(name="Visualizações:", value="`{}`".format(player.views))
-                    mscemb2.add_field(name="Enviado em:", value="`{}`".format(player.upload_date))
-                    mscemb2.add_field(name="Enviado por:", value="`{}`".format(player.uploader))
-                    mscemb2.add_field(name="Duraçao:", value="`{}`".format(player.duration))
-                    mscemb2.add_field(name="Likes:", value="`{}`".format(player.likes))
-                    mscemb2.add_field(name="Deslikes:", value="`{}`".format(player.dislikes))
-                    await ctx.send(embed=mscemb2)
-                except Exception as error:
-                    await ctx.send("Error2: [{error}]".format(error=error))
-        except Exception as e:
-            await ctx.send("Error3: [{error}]".format(error=e))
+###########################################
 ##Prepare game room
-    @commands.command(name='letsPlay', help = 'Cria salas online para jogar certos jogos. \n<game> é o nome do jogo.')
-    async def newRoom(self, ctx, game):
+    @commands.command(name='letsPlay', help = 'Cria salas para certos jogos. \n[game...] é o nome do jogo.')
+    async def newRoom(self, ctx, *game):
 
         games = {'Broken Picture Phone':('https://www.brokenpicturephone.com/?room=manjuba',None),
-                 'Colonist':('https://colonist.io/', 
-                                     '//*[@id="landingpage_enter_lobby_button"]', 
-                                     '//*[@id="lobby_cta_create"]', 
-                                     '//*[@id="room_center_checkbox_privategame"]'),
-                 'Codenames':('https://codenames.game/', None)}
+                 'Colonist':('https://colonist.io/#UMJC', None),
+                 'Codenames':('https://codenames.game/room/quack-ant-meter', None)}
+        game = ' '.join(game)
         ##Se o jogo n estiver no catalogo
         if not game in games:
             await ctx.send('Não encontrei este jogo no meu catálogo. Por favor escolha um dentre os seguintes:')
@@ -84,7 +33,7 @@ class UnderDevelopment(commands.Cog):
         else:
             ##Se o jogo não precisa criar uma nova sala
             if games[game][1]==None:
-                await ctx.send(f'Aqui está o link!{games[game]}')
+                await ctx.send(f'Aqui está o link! {games[game][0]}')
             else:
                 ##Cria nova sala clicando nos botoes estipulados
                 driver = webdriver.Chrome()
@@ -96,7 +45,66 @@ class UnderDevelopment(commands.Cog):
                     elemento.click()
                 await ctx.send(f'Aqui está o link!{driver.current_url}')
                 driver.quit()
-##
+
+##FGO image search
+    @commands.command(name='ServantPics', help = 'Pesquisa imagens de um servo\n[name...] é o nome do servo.')
+    async def imageSearchServants(self,ctx, *name):
+    ##Functions###################
+        ##Checks if the message is valid
+        def check(msg):
+                return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.replace(' ','').isnumeric()
+        def chooseAscension(servantNumber,data, msg):
+            images = []
+            ascensions = msg.strip().split(' ')
+            for i, ascension in enumerate(ascensions):
+                try:
+                    images.append(data[servantNumber]['extraAssets']['charaGraph']['ascension'][ascension])
+                except:
+                    images.append(f'Não encontrei imagem para a ascenção {ascension}')
+            return images
+        ##Dados
+        name = '+'.join(name)
+        data =  requests.get('https://api.atlasacademy.io/nice/NA/servant/search?name={}'.format(name)).json()
+        ##Checking data
+        if len(data)== 0:
+            await ctx.send('Não foram encontrados servos')
+        else:
+            ##Working with data
+            response = f'Foram encontrados {len(data)} resultados:'
+            for i in range(len(data)):
+                response += '\n'+ str(i+1) + ' - ' + data[i]['name']
+            response += '\nDigite o número correspondente'
+            reply = await ctx.send(response)
+    
+            ##Waits for user entry
+            try:
+                msg = await self.bot.wait_for('message',check = check,timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send('Demorou demais!')
+                await reply.delete()
+            else:
+                await reply.delete()
+                await msg.delete()
+                servantNumber = int(msg.content)-1
+                
+                reply = await ctx.send('Escolha as ascenções! Digite os valores separados por espaço.')
+               ##Waits for user entry
+                try:
+                    msg = await self.bot.wait_for('message',check = check,timeout=30)
+                except asyncio.TimeoutError:
+                    await ctx.send('Demorou demais!')
+                    await reply.delete()
+                else:    
+                    await reply.delete()
+                    await msg.delete()
+
+                   
+                    images = chooseAscension(servantNumber,data, msg.content)
+                    for i in images:    
+                        await ctx.send(i)
+                    
+                    #await ctx.send(embed = embed)
+################################
 
 
 def setup(bot):

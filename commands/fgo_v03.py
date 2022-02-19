@@ -48,7 +48,8 @@ class FGO(commands.Cog):
                 await ctx.send('Demorou demais!')
                 await reply.delete()
             else:
-         
+                await reply.delete()
+                await msg.delete()
                 servantNumber = int(msg.content)-1
                 ##Images
                 imageUrl = data[servantNumber]['extraAssets']['charaGraph']['ascension']['4']

@@ -19,7 +19,7 @@ class Utility(commands.Cog):
         finally:       
             await ctx.send(f'{cnt} mensagens apagadas com sucesso!')
 
-    @commands.command(name ='calc',help='Calculadora. Utilize linguagem tradicional de programação.')
+    @commands.command(name ='calc',help='Calculadora.')
     async def calculate(self,ctx,*expression):
         expression = ''.join(expression)
         response = eval(expression)

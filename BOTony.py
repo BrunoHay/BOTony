@@ -1,9 +1,18 @@
 # import nest_asyncio
 # nest_asyncio.apply()
+
 from discord.ext import commands
 from decouple import config
 import os
-sign = '$'
+#############################
+mode = 'deploy' #test or deploy
+#############################
+if mode == 'test':
+    
+    sign = '!'
+else:
+    sign = '$'
+    
 bot = commands.Bot(sign)
 
 def load_cogs(bot):
@@ -21,4 +30,7 @@ load_cogs(bot)
 
 TOKEN = config('TOKEN')
 TOKEN_TESTES = config('TOKEN_TESTES')
-bot.run(TOKEN)
+if mode == 'test':
+    bot.run(TOKEN_TESTES)
+else:
+    bot.run(TOKEN)
