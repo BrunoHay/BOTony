@@ -54,7 +54,6 @@ class FGO(commands.Cog):
                 ##Images
                 imageUrl = data[servantNumber]['extraAssets']['charaGraph']['ascension']['4']
                 imageFace= data[servantNumber]['extraAssets']['faces']['ascension']['4']
-                imageNarrow = data[servantNumber]['extraAssets']['narrowFigure']['ascension']['4']
                 imageStatus = data[servantNumber]['extraAssets']['status']['ascension']['3']
                 
                 ##Building skills
@@ -79,7 +78,63 @@ class FGO(commands.Cog):
                 embed.add_field(name='Skills', value=skills,inline = False)
                 embed.add_field(name='Noble Phantasm', value=noblePhantasm, inline = False)
                 embed.set_footer(text='Brought to you by Hayashi')
-                
                 await ctx.send(embed = embed)
+##FGO image search
+    @commands.command(name='ServantPics', help = 'Pesquisa imagens de um servo\n[name...] é o nome do servo.')
+    async def imageSearchServants(self,ctx, *name):
+    ##Functions###################
+        ##Checks if the message is valid
+        def check(msg):
+                return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.replace(' ','').isnumeric()
+        def chooseAscension(servantNumber,data, msg):
+            images = []
+            ascensions = msg.strip().split(' ')
+            for i, ascension in enumerate(ascensions):
+                try:
+                    images.append(data[servantNumber]['extraAssets']['charaGraph']['ascension'][ascension])
+                except:
+                    images.append(f'Não encontrei imagem para a ascenção {ascension}')
+            return images
+        ##Dados
+        name = '+'.join(name)
+        data =  requests.get('https://api.atlasacademy.io/nice/NA/servant/search?name={}'.format(name)).json()
+        ##Checking data
+        if len(data)== 0:
+            await ctx.send('Não foram encontrados servos')
+        else:
+            ##Working with data
+            response = f'Foram encontrados {len(data)} resultados:'
+            for i in range(len(data)):
+                response += '\n'+ str(i+1) + ' - ' + data[i]['name']
+            response += '\nDigite o número correspondente'
+            reply = await ctx.send(response)
+    
+            ##Waits for user entry
+            try:
+                msg = await self.bot.wait_for('message',check = check,timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send('Demorou demais!')
+                await reply.delete()
+            else:
+                await reply.delete()
+                await msg.delete()
+                servantNumber = int(msg.content)-1
+                
+                reply = await ctx.send('Escolha as ascenções! Digite os valores separados por espaço.')
+               ##Waits for user entry
+                try:
+                    msg = await self.bot.wait_for('message',check = check,timeout=30)
+                except asyncio.TimeoutError:
+                    await ctx.send('Demorou demais!')
+                    await reply.delete()
+                else:    
+                    await reply.delete()
+                    await msg.delete()
+
+                   
+                    images = chooseAscension(servantNumber,data, msg.content)
+                    for i in images:    
+                        await ctx.send(i)
+                        
 def setup(bot):
     bot.add_cog(FGO(bot))

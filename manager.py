@@ -35,14 +35,13 @@ class Manager(commands.Cog):
         elif message.author.id == 434893007284862977:
             opcoes = ['👁️','Eu sei o que você fez comigo...', 
                       '💀', 
-                      'Minha vingança será maligna...', 
-                      ' ', 
+                      'Minha vingança será maligna...',  
                       '👁️👁️', 
                       'Meu assassino está entre nós...', 
                       'Há um assassino entre nós.', 
                       'Seven days...',
                       'Meu assassino ainda vive...']
-            if random.random()>=0.5:
+            if random.random()>=0.8:
                 await message.channel.send(random.choice(opcoes))
             try:
                 if random.random()>=0.8:
