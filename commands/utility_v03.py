@@ -23,7 +23,7 @@ class Utility(commands.Cog):
     async def calculate(self,ctx,*expression):
         expression = ''.join(expression)
         response = eval(expression)
-        await ctx.send('Ans= {}'.format(round(response)))
+        await ctx.send('Ans= {}'.format(response))
         
 def setup(bot):
     bot.add_cog(Utility(bot))
