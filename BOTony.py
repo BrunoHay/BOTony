@@ -1,11 +1,11 @@
-# import nest_asyncio
-# nest_asyncio.apply()
+import nest_asyncio
+nest_asyncio.apply()
 
 from discord.ext import commands
 from decouple import config
 import os
 #############################
-mode = 'deploy' #test or deploy
+mode = 'test' #test or deploy
 #############################
 if mode == 'test':
     
@@ -30,6 +30,8 @@ load_cogs(bot)
 
 TOKEN = config('TOKEN')
 TOKEN_TESTES = config('TOKEN_TESTES')
+
+
 if mode == 'test':
     bot.run(TOKEN_TESTES)
 else:
