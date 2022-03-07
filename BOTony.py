@@ -1,12 +1,14 @@
-# import nest_asyncio
-# nest_asyncio.apply()
-
-from discord.ext import commands
+import nest_asyncio
+nest_asyncio.apply()
 from decouple import config
+
+#############################
+mode = config('mode') #test or deploy
+#mode = 'test' #test or deploy
+#############################
+from discord.ext import commands
 import os
-#############################
-mode = 'deploy' #test or deploy
-#############################
+
 if mode == 'test':
     
     sign = '!'
