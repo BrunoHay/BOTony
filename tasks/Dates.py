@@ -56,7 +56,7 @@ class Dates(commands.Cog):
         channel = self.bot.get_channel(950215017310072892)
         await channel.send(f'Está mensagem foi enviada em {datetime.datetime.now()}')
     
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=10)
     async def dacNoticias(self):
         channel = self.bot.get_channel(938193288333262881)
         driver =initSelenium()
@@ -74,13 +74,16 @@ class Dates(commands.Cog):
         info = [[heads[i].text,excerpts[i].text,dates[i].text] for i in range(len(heads))]
         
         dif = [noticia for noticia in info if not noticia in infoVelha ]
+        print(dif[0])
         if len(dif)!=0:
+            print('Nova notícia')
             infoVelha = info
             await channel.send(f'Nova Notícia retirada de {driver.title}!')
             for noticia in dif:
                 print(noticia[0])
                 await channel.send(noticia[0])
         else:
+            print('Sem nova notícia')
             await channel.send('Sem notícias novas!')
             
             
