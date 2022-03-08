@@ -19,7 +19,7 @@ def initSelenium():
     chrome_options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'),options=chrome_options)
     return driver
-
+#######################################
 class UnderDevelopment(commands.Cog):
     ''' Still under development '''
     
@@ -38,6 +38,8 @@ class UnderDevelopment(commands.Cog):
         elemento.click()
         print(driver.title)
         print(driver.current_url)
+        
+
 ##Prepare game room
     @commands.command(name='letsPlay', help = 'Cria salas para certos jogos. \n[game...] é o nome do jogo.')
     async def newRoom(self, ctx, *game):

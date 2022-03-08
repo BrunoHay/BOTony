@@ -14,6 +14,7 @@ class Manager(commands.Cog):
         print('Pronto para rodar')
         #current_time.start()
 
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error,MissingRequiredArgument):
