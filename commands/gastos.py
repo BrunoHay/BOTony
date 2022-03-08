@@ -128,10 +128,13 @@ class Gastos(commands.Cog):
             result = sheet.values().get(spreadsheetId=SS_ID,
                                         range=Range).execute()
             values = result.get('values', [])
-            ppl = 'Você deve para estas pessoas:'
-            for i in range(len(values)):
-                ppl += f'\n{values[i][0]}: R${values[i][1]}'
-            await ctx.send(ppl)
+            if '#' in values[0][0]:
+                await ctx.send('Você não deve nada a ninguém')
+            else:         
+                ppl = 'Você deve para estas pessoas:'
+                for i in range(len(values)):
+                    ppl += f'\n{values[i][0]}: R${values[i][1]}'
+                await ctx.send(ppl)
 
         else:
             # Se houver arg procura o nome e retorna valor
@@ -213,7 +216,7 @@ class Gastos(commands.Cog):
                             resto = resto-debts[w]
                             alterDebts.append(w)
                             w += 1
-                            
+                        resto = round(resto,2)
                         # print(f'alterDebts = {alterDebts}')
                         # print(f'resto = {resto}')
 
@@ -240,7 +243,7 @@ class Gastos(commands.Cog):
                             range = whereInput2[-1],
                             valueInputOption="USER_ENTERED", body=body2).execute()
                         await ctx.send(f'Foram quitadas {len(alterDebts)-1} dívidas de {len(debts)}')
-                        await ctx.send(f'Ainda faltam R${sum(debts)-valor}')
+                        await ctx.send(f'Ainda faltam R${round(sum(debts)-valor,2)}')
                         return
                 #If user entry lasts more than timeout
                 except asyncio.TimeoutError:

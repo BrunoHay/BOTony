@@ -66,8 +66,8 @@ class Dates(commands.Cog):
         dates = post.find_elements(By.CLASS_NAME , 'info')
         unicampLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[1]')
         dacLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[2]')
-        unicampLogoUrl = unicampLogo.value_of_css_property("background-image").split('"')[1]
-        dacLogoUrl = dacLogo.value_of_css_property("background-image").split('"')[1]
+        unicampLogoUrl = unicampLogo.value_of_css_property("background-image")
+        dacLogoUrl = dacLogo.value_of_css_property("background-image")
         #info[i][0]=titulo
         #info[i][1]=subtitulo
         #info[i][2]=data
@@ -83,13 +83,11 @@ class Dates(commands.Cog):
         embed.set_author(name='Unicamp',icon_url = dacLogoUrl)
         embed.set_thumbnail(url = unicampLogoUrl)
         
-        embed.set_footer(text='Brought to you by Hayashi')
         
         if len(dif)!=0:
             
             infoVelha = info
             
-            await channel.send(f'Nova Notícia retirada de {Titulo}')
             for noticia in dif:
                 embed.add_field(name=noticia[0], value=noticia[1], inline = False)
                 
