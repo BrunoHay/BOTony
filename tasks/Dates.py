@@ -1,5 +1,6 @@
 from discord.ext import commands, tasks
-import datetime
+import discord
+
 import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -46,45 +47,56 @@ class Dates(commands.Cog):
         
     @commands.Cog.listener()
     async def on_ready(self):
-        #self.sayHello.start()
         self.dacNoticias.start()
         pass
     
         
-    @tasks.loop(minutes=10)
-    async def sayHello(self):
-        channel = self.bot.get_channel(950215017310072892)
-        await channel.send(f'Está mensagem foi enviada em {datetime.datetime.now()}')
+
     
-    @tasks.loop(minutes=10)
+    @tasks.loop(hours=1)
     async def dacNoticias(self):
         channel = self.bot.get_channel(938193288333262881)
         driver =initSelenium()
         global infoVelha
         driver.get('https://www.dac.unicamp.br/portal/noticias')
-
+        Titulo = driver.title
         post = driver.find_element(By.CLASS_NAME  , 'post-list')
         heads = post.find_elements(By.TAG_NAME , 'h4')
         excerpts = post.find_elements(By.CLASS_NAME , 'excerpt')
         dates = post.find_elements(By.CLASS_NAME , 'info')
-
+        unicampLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[1]')
+        dacLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[2]')
+        unicampLogoUrl = unicampLogo.value_of_css_property("background-image").split('"')[1]
+        dacLogoUrl = dacLogo.value_of_css_property("background-image").split('"')[1]
         #info[i][0]=titulo
         #info[i][1]=subtitulo
         #info[i][2]=data
         info = [[heads[i].text,excerpts[i].text,dates[i].text] for i in range(len(heads))]
         
         dif = [noticia for noticia in info if not noticia in infoVelha ]
+        embed = discord.Embed(
+            title = Titulo,
+            description = 'Notícias Fresquinhas!',
+            colour = 0x0000FF,
+            )
+        
+        embed.set_author(name='Unicamp',icon_url = dacLogoUrl)
+        embed.set_thumbnail(url = unicampLogoUrl)
+        
+        embed.set_footer(text='Brought to you by Hayashi')
         
         if len(dif)!=0:
-            print('Nova notícia')
+            
             infoVelha = info
-            await channel.send(f'Nova Notícia retirada de {driver.title}!')
+            
+            await channel.send(f'Nova Notícia retirada de {Titulo}')
             for noticia in dif:
-                print(noticia[0])
-                await channel.send(noticia[0])
+                embed.add_field(name=noticia[0], value=noticia[1], inline = False)
+                
+            await channel.send(embed = embed)
         else:
-            print('Sem nova notícia')
-            await channel.send('Sem notícias novas!')
+            
+            await channel.send(f'Sem notícias novas em {Titulo}!')
             
             
         driver.quit()
