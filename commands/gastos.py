@@ -85,6 +85,7 @@ class Gastos(commands.Cog):
                     try:
                         msg = await self.bot.wait_for('message',check = check,timeout=20)
                         List[0][3] += f' /{msg.content}'
+                        List[0][4] = List[0][1]
                     except asyncio.TimeoutError:
                         await ctx.send('Demorou demais!')
 

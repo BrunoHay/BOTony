@@ -74,7 +74,7 @@ class Dates(commands.Cog):
         info = [[heads[i].text,excerpts[i].text,dates[i].text] for i in range(len(heads))]
         
         dif = [noticia for noticia in info if not noticia in infoVelha ]
-        print(dif[0])
+        
         if len(dif)!=0:
             print('Nova notícia')
             infoVelha = info
