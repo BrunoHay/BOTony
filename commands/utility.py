@@ -25,6 +25,26 @@ class Utility(commands.Cog):
         response = eval(expression)
         await ctx.send('Ans= {}'.format(response))
         
+    @commands.command(name='report',help='Reporta algum bug ou possível melhoria para o BOT.')
+    async def report(self, ctx, *msg):
+        if len(msg) == 0:
+            return
+        else:
+            channel = self.bot.get_channel(950215017310072892)
+            msg = ' '.join(msg)
+            author = ctx.author
+            await channel.send(f'De: {author}\n"{msg}"')
+            await ctx.send('Obrigado pelo report! Sua mensagem foi enviada ao desenvolvedor.')
+            
+    @commands.command(name='repeat',help='Repete a mensagem')
+    async def repeat(self, ctx,*msg):
+        if len(msg) == 0:
+            return
+        else:
+            msg = ' '.join(msg)
+            print(msg)
+            await ctx.send(msg)
+            
 def setup(bot):
     bot.add_cog(Utility(bot))
     
