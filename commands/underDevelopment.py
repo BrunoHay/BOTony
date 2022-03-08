@@ -62,6 +62,17 @@ def searchRange(SS_ID,searchPage,searchColumn,searchTerm,returnColumn,returnRang
                 VALUES.append(sheet.values().get(spreadsheetId=SS_ID,
                                             range="'{}'!{}{}".format(searchPage,returnColumn,i+2)).execute().get('values', [])[0][0])
         return VALUES
+    
+    
+def initSelenium():
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--no-sandbox')
+    driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'),options=chrome_options)
+    return driver
+
 class UnderDevelopment(commands.Cog):
     ''' Still under development '''
     
@@ -71,20 +82,22 @@ class UnderDevelopment(commands.Cog):
 ###########################################
     @commands.command(name='seleniumTest',help = 'Testing selenium imp')
     async def seleniumT(self,ctx):
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--no-sandbox')
-        driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'),options=chrome_options)
+        driver =initSelenium()
         driver.get('https://www.dac.unicamp.br/portal/')
+        elemento = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'/html/body/section[1]/div/div/div[2]/ul/li[5]/a')))
+        elemento.click()
         print(driver.title)
+        elemento = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@id="conteudo"]/div[1]/table/tbody/tr[2]/td[1]/a')))
+        elemento.click()
+        print(driver.title)
+        print(driver.current_url)
 ##Prepare game room
     @commands.command(name='letsPlay', help = 'Cria salas para certos jogos. \n[game...] é o nome do jogo.')
     async def newRoom(self, ctx, *game):
 
         games = {'Broken Picture Phone':('https://www.brokenpicturephone.com/?room=manjuba',None),
-                 'Colonist':('https://colonist.io/#UMJC', None),
+                 'Colonist':('https://colonist.io', '//*[@id="landingpage_enter_lobby_button"]',
+                             '//*[@id="lobby_cta_create"]','//*[@id="room_center_checkbox_privategame"]'),
                  'Codenames':('https://codenames.game/room/quack-ant-meter', None)}
         game = ' '.join(game)
         ##Se o jogo n estiver no catalogo
@@ -100,7 +113,7 @@ class UnderDevelopment(commands.Cog):
                 await ctx.send(f'Aqui está o link! {games[game][0]}')
             else:
                 ##Cria nova sala clicando nos botoes estipulados
-                driver = webdriver.Chrome()
+                driver = initSelenium()
                 driver.get(games[game][0])
     
                 for i in range(1,len(games[game])):
