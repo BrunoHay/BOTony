@@ -67,7 +67,7 @@ class Gastos(commands.Cog):
         def check(msg):
                 return msg.author == ctx.author and msg.channel == ctx.channel
         # SpreadSheet Properties
-        SSP = {'pages':['data','Dashboard'],
+        SSP = {'pages':['data','compilado','Dashboard'],
                'columns':['Descrição','Valor','Local da compra','Método de pagamento','Obs.','Data']}
         
         if not ctx.author.id == 432384321018658826:
@@ -80,6 +80,30 @@ class Gastos(commands.Cog):
                 SS_ID = config('SS_ID')
                 # Adds info in order <descrição> <valor> <local_da_compra> <método_de_pagamento>
                 List = [list(values)]
+                #List = [['Arg0', 'Arg1', 'Arg2', 'Arg3']]
+                
+                # For longer description, use ""
+                firstArg=''
+                ap =[]
+                #Encontra a posição dos argumentos com "
+                for i, arg in enumerate(List[0]):
+                    if '"' in arg:                   
+                        ap.append(i)
+                
+                if not len(ap)==0: 
+                    #Para cada par inicio/final...
+                    for k in range(len(ap)//2):
+                        #Cria um j q vai do inicio até o final da primeira dupla inicio/final
+                        for j in range(ap[2*k],ap[2*k+1]+1):
+                            #mapeia primeiro valor
+                            if j == ap[k*2]:
+                                inicio = j
+                                firstArg += List[0][inicio] 
+                            else:
+                                #Corta e cola cada arg entre inicio/final no primeiro arg
+                                firstArg += ' '+List[0].pop(inicio+1)
+                    List[0][inicio]= firstArg.replace('"','')
+                
                 if 'devendo' in List[0][3].casefold():
                     await ctx.send('Para quem você está devendo?')
                     try:
@@ -118,6 +142,9 @@ class Gastos(commands.Cog):
                 
     @commands.command(name='devo?', help = 'Estou devendo algo?\n<*name> é o nome da pessoa a qual se deve.')
     async def sheetCheck(self, ctx, *name):
+        if not ctx.author.id == 432384321018658826:
+            await ctx.send('Desculpe, apenas disponível para o Hayashi. Se você quiser acesso contate ele.')
+            return
         creds = initCreds()
         sheet = initSheet(creds)
         SS_ID = config('SS_ID')
@@ -154,6 +181,9 @@ class Gastos(commands.Cog):
         
     @commands.command(name='pagar',help='Quita a dívida que você possa ter com alguém.\n <name> é o nome de para quem se deve')
     async def pay(self,ctx,name):
+        if not ctx.author.id == 432384321018658826:
+            await ctx.send('Desculpe, apenas disponível para o Hayashi. Se você quiser acesso contate ele.')
+            return
         # Auxiliar Functions
         def check(msg):
                 return msg.author == ctx.author and msg.channel == ctx.channel
@@ -252,6 +282,20 @@ class Gastos(commands.Cog):
         #If name isnt found
         await ctx.send('Não encontrei o nome citado...')
 
-
+    @commands.command(name='ver',help='Retorna algum valor.\n ')
+    async def look(self,ctx):
+        if not ctx.author.id == 432384321018658826:
+            await ctx.send('Desculpe, apenas disponível para o Hayashi. Se você quiser acesso contate ele.')
+            return
+        creds = initCreds()
+        sheet = initSheet(creds)
+        SS_ID = config('SS_ID')
+        Range = 'compilado!AA2:AB'
+      
+        result = sheet.values().get(spreadsheetId=SS_ID,
+                                    range=Range).execute()
+        values = result.get('values', [])
+        
+        
 def setup(bot):
     bot.add_cog(Gastos(bot))

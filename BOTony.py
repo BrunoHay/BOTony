@@ -4,7 +4,6 @@ from decouple import config
 
 #############################
 mode = config('mode') #test or deploy
-#mode = 'test' #test or deploy
 #############################
 from discord.ext import commands
 import os

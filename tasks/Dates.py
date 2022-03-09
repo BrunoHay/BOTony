@@ -4,6 +4,7 @@ import discord
 import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from BOTony import mode
 infoVelha = [['Alteração de matrícula 1º semestre de 2022',
   'Caso você tenha perdido o prazo de matrícula, ou queira efetuar alguma modificação, é possível solicitar inclusão ou exclusão de disciplinas no período de alteração de matrícula.',
   'Publicado em 07/02/2022'],
@@ -31,12 +32,17 @@ infoVelha = [['Alteração de matrícula 1º semestre de 2022',
  ['Titulo Velho 1','Subtitulo Velho 1', 'Data Velha 1'],
  ['Titulo Velho 2','Subtitulo Velho 2', 'Data Velha 2']]
 def initSelenium():
+    global mode
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--no-sandbox')
-    driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'),options=chrome_options)
+    if mode == 'test':
+        chrome_options.add_argument('headless')
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--no-sandbox')
+        driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'),options=chrome_options)
     return driver
 
 class Dates(commands.Cog):
@@ -50,12 +56,10 @@ class Dates(commands.Cog):
         self.dacNoticias.start()
         pass
     
-        
 
-    
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=24)
     async def dacNoticias(self):
-        channel = self.bot.get_channel(938193288333262881)
+        channel = self.bot.get_channel(950944575910998158)
         driver =initSelenium()
         global infoVelha
         driver.get('https://www.dac.unicamp.br/portal/noticias')
@@ -66,8 +70,8 @@ class Dates(commands.Cog):
         dates = post.find_elements(By.CLASS_NAME , 'info')
         unicampLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[1]')
         dacLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[2]')
-        unicampLogoUrl = unicampLogo.value_of_css_property("background-image")
-        dacLogoUrl = dacLogo.value_of_css_property("background-image")
+        unicampLogoUrl = unicampLogo.value_of_css_property("background-image").split('"')[1]
+        dacLogoUrl = dacLogo.value_of_css_property("background-image").split('"')[1]
         #info[i][0]=titulo
         #info[i][1]=subtitulo
         #info[i][2]=data
@@ -77,23 +81,19 @@ class Dates(commands.Cog):
         embed = discord.Embed(
             title = Titulo,
             description = 'Notícias Fresquinhas!',
-            colour = 0x0000FF,
+            colour = 0xffffff,
             )
         
-        embed.set_author(name='Unicamp',icon_url = dacLogoUrl)
-        embed.set_thumbnail(url = unicampLogoUrl)
-        
-        
+        embed.set_author(name='Unicamp')     
+        embed.set_footer(text=driver.current_url)
         if len(dif)!=0:
-            
             infoVelha = info
-            
+           
             for noticia in dif:
                 embed.add_field(name=noticia[0], value=noticia[1], inline = False)
                 
             await channel.send(embed = embed)
-        else:
-            
+        else:       
             await channel.send(f'Sem notícias novas em {Titulo}!')
             
             
