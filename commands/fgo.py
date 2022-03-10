@@ -13,6 +13,9 @@ class FGO(commands.Cog):
 
     @commands.command(name='servant', help = 'Pesquisa dados de um servo\n[name...] é o nome do servo.')
     async def searchServant(self,ctx, *name):
+        if len(name)==0:
+            await ctx.send('Número de argumentos inválido!')
+            return
     ##Functions###################
         ##Checks if the message is valid
         def check(msg):
@@ -82,6 +85,9 @@ class FGO(commands.Cog):
 ##FGO image search
     @commands.command(name='servantPics', help = 'Pesquisa imagens de um servo\n[name...] é o nome do servo.')
     async def imageSearchServants(self,ctx, *name):
+        if len(name)==0:
+            await ctx.send('Número de argumentos inválido!')
+            return
     ##Functions###################
         ##Checks if the message is valid
         def check(msg):
@@ -140,6 +146,9 @@ class FGO(commands.Cog):
 ##JP VERSION                     
     @commands.command(name='servantJP', help = 'Pesquisa dados de um servo no JP\n[name...] é o nome do servo.')
     async def searchServantJP(self,ctx, *name):
+        if len(name)==0:
+            await ctx.send('Número de argumentos inválido!')
+            return
     ##Functions###################
         ##Checks if the message is valid
         def check(msg):
@@ -209,6 +218,9 @@ class FGO(commands.Cog):
 ##FGO image search
     @commands.command(name='servantPicsJP', help = 'Pesquisa imagens de um servo no JP\n[name...] é o nome do servo.')
     async def imageSearchServantsJP(self,ctx, *name):
+        if len(name)==0:
+            await ctx.send('Número de argumentos inválido!')
+            return
     ##Functions###################
         ##Checks if the message is valid
         def check(msg):

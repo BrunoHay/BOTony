@@ -63,6 +63,9 @@ class Gastos(commands.Cog):
         
     @commands.command(name='add', help = 'Adiciona novo gasto\n<descrição> <valor> <local_compra> <método_pagamento> <obs>')
     async def sheetAppend(self, ctx, *values):
+        if len(values)==0:
+            await ctx.send('Número de argumentos inválido!')
+            return
         # Auxiliar Functions
         def check(msg):
                 return msg.author == ctx.author and msg.channel == ctx.channel

@@ -5,32 +5,44 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from BOTony import mode
-infoVelha = [['Alteração de matrícula 1º semestre de 2022',
-  'Caso você tenha perdido o prazo de matrícula, ou queira efetuar alguma modificação, é possível solicitar inclusão ou exclusão de disciplinas no período de alteração de matrícula.',
-  'Publicado em 07/02/2022'],
- ['Comprovante vacinação',
-  'Os estudantes ingressantes tem até 5 dias após a matrícula para fazer a inserção do documento no sistema e-DAC.',
-  'Publicado em 01/02/2022'],
- ['ProFIS - Ingresso na Graduação 2022',
-  'Confira a lista dos estudantes do ProFIS - Concluintes 2021 com respectiva vaga obtida em curso de Graduação Unicamp em 2022.',
-  'Publicado em 01/02/2022'],
- ['Lista PROFIS - Concluintes 2021',
-  'Confira aqui a lista dos alunos concluintes do ProFIS de 2021, em ordem decrescente de CRO:',
-  'Publicado em 24/01/2022'],
- ['Manutenção Programada - Sistemas SIGA/E-DAC e SIG/Estágios, Portais DAC e SAE - 30/01',
-  'Neste domingo (30/01) será realizada uma manutenção programada nos sistemas SIGA/E-DAC e SIG, Portais DAC e SAE. Durante a janela de manutenção os serviços ficarão indisponíveis.',
-  'Publicado em 23/01/2022'],
- ['Atendimento da DAC - via Fale Conosco',
-  'Durante o período de suspensão das atividades presenciais, o atendimento da DAC está prestando seus serviços normalmente - de forma remota - por meio do Fale Conosco.',
-  'Publicado em 07/01/2022'],
- ['Deliberação CEPE A-21/21',
-  'Fique atento: Deliberação CEPE-A-21/2021 de 07/12/2021 que dispõe sobre a obrigatoriedade de apresentação do comprovante de vacinação contra a Covid-19 pelos discentes da Unicamp e dá outras providências.',
-  'Publicado em 14/12/2021'],
- ['Resolução GR nº. 81/2021',
-  'Altera a Resolução GR-074/2021, de 12/11/2021 que dispõe sobre a retomada das atividades presenciais dos alunos de graduação, pós-graduação, extensão e colégios técnicos nos campi da Universidade Estadual de Campinas no 1º semestre de 2022 e sobre a adoção de medidas emergenciais e temporárias, com objetivo de minimizar a transmissão e disseminação da Covid-19.',
-  'Publicado em 10/12/2021'],
- ['Titulo Velho 1','Subtitulo Velho 1', 'Data Velha 1'],
- ['Titulo Velho 2','Subtitulo Velho 2', 'Data Velha 2']]
+import datetime
+from asyncio import sleep
+
+def seconds_until(hours, minutes):
+    given_time = datetime.time(hours, minutes)
+    now = datetime.datetime.now()
+    future_exec = datetime.datetime.combine(now, given_time)
+    if (future_exec - now).days < 0:  
+        future_exec = datetime.datetime.combine(now + datetime.timedelta(days=1), given_time) 
+
+    return (future_exec - now).total_seconds()
+infoVelha= []
+# infoVelha = [['Alteração de matrícula 1º semestre de 2022',
+#   'Caso você tenha perdido o prazo de matrícula, ou queira efetuar alguma modificação, é possível solicitar inclusão ou exclusão de disciplinas no período de alteração de matrícula.',
+#   'Publicado em 07/02/2022'],
+#  ['Comprovante vacinação',
+#   'Os estudantes ingressantes tem até 5 dias após a matrícula para fazer a inserção do documento no sistema e-DAC.',
+#   'Publicado em 01/02/2022'],
+#  ['ProFIS - Ingresso na Graduação 2022',
+#   'Confira a lista dos estudantes do ProFIS - Concluintes 2021 com respectiva vaga obtida em curso de Graduação Unicamp em 2022.',
+#   'Publicado em 01/02/2022'],
+#  ['Lista PROFIS - Concluintes 2021',
+#   'Confira aqui a lista dos alunos concluintes do ProFIS de 2021, em ordem decrescente de CRO:',
+#   'Publicado em 24/01/2022'],
+#  ['Manutenção Programada - Sistemas SIGA/E-DAC e SIG/Estágios, Portais DAC e SAE - 30/01',
+#   'Neste domingo (30/01) será realizada uma manutenção programada nos sistemas SIGA/E-DAC e SIG, Portais DAC e SAE. Durante a janela de manutenção os serviços ficarão indisponíveis.',
+#   'Publicado em 23/01/2022'],
+#  ['Atendimento da DAC - via Fale Conosco',
+#   'Durante o período de suspensão das atividades presenciais, o atendimento da DAC está prestando seus serviços normalmente - de forma remota - por meio do Fale Conosco.',
+#   'Publicado em 07/01/2022'],
+#  ['Deliberação CEPE A-21/21',
+#   'Fique atento: Deliberação CEPE-A-21/2021 de 07/12/2021 que dispõe sobre a obrigatoriedade de apresentação do comprovante de vacinação contra a Covid-19 pelos discentes da Unicamp e dá outras providências.',
+#   'Publicado em 14/12/2021'],
+#  ['Resolução GR nº. 81/2021',
+#   'Altera a Resolução GR-074/2021, de 12/11/2021 que dispõe sobre a retomada das atividades presenciais dos alunos de graduação, pós-graduação, extensão e colégios técnicos nos campi da Universidade Estadual de Campinas no 1º semestre de 2022 e sobre a adoção de medidas emergenciais e temporárias, com objetivo de minimizar a transmissão e disseminação da Covid-19.',
+#   'Publicado em 10/12/2021'],
+#  ['Titulo Velho 1','Subtitulo Velho 1', 'Data Velha 1'],
+#  ['Titulo Velho 2','Subtitulo Velho 2', 'Data Velha 2']]
 def initSelenium():
     global mode
     chrome_options = webdriver.ChromeOptions()
@@ -54,13 +66,16 @@ class Dates(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.dacNoticias.start()
-        pass
+        self.cardapio.start()
+        
     
 
-    @tasks.loop(hours=24)
+    @tasks.loop(hours=23,minutes=58)
     async def dacNoticias(self):
         channel = self.bot.get_channel(950944575910998158)
         driver =initSelenium()
+        print('RODANDO DACNOTICIAS')
+        await sleep(seconds_until(1,10))
         global infoVelha
         driver.get('https://www.dac.unicamp.br/portal/noticias')
         Titulo = driver.title
@@ -68,10 +83,10 @@ class Dates(commands.Cog):
         heads = post.find_elements(By.TAG_NAME , 'h4')
         excerpts = post.find_elements(By.CLASS_NAME , 'excerpt')
         dates = post.find_elements(By.CLASS_NAME , 'info')
-        unicampLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[1]')
-        dacLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[2]')
-        unicampLogoUrl = unicampLogo.value_of_css_property("background-image").split('"')[1]
-        dacLogoUrl = dacLogo.value_of_css_property("background-image").split('"')[1]
+        # unicampLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[1]')
+        # dacLogo = driver.find_element(By.XPATH , '//*[@id="navegacao-fixed-top"]/nav/div[1]/a[2]')
+        # unicampLogoUrl = unicampLogo.value_of_css_property("background-image").split('"')[1]
+        # dacLogoUrl = dacLogo.value_of_css_property("background-image").split('"')[1]
         #info[i][0]=titulo
         #info[i][1]=subtitulo
         #info[i][2]=data
@@ -94,11 +109,50 @@ class Dates(commands.Cog):
                 
             await channel.send(embed = embed)
         else:       
-            await channel.send(f'Sem notícias novas em {Titulo}!')
-            
-            
+            await channel.send(f'Sem notícias novas em {Titulo}!')    
+        print('PAREI DE RODAR DACNOTICIAS')
         driver.quit()
     
+    @tasks.loop(hours=23,minutes=58)
+    async def cardapio(self):
+        await sleep(seconds_until(8,00))
+        channel = self.bot.get_channel(950944575910998158)
+        driver =initSelenium()
+        driver.get('https://www.prefeitura.unicamp.br/cardapio/')
+        
+        iframe = driver.find_element(By.TAG_NAME, 'iframe')
+        driver.switch_to.frame(iframe)
+        
+        sections = driver.find_elements(By.CLASS_NAME, 'menu-section')
+        date = driver.find_element(By.ID, 'menu').find_element(By.TAG_NAME , 'a').text
+        cardapio = []
+        #Cria dicionario para cada refeição (Almoço / Almoço vegetariano / Jantar / Jantar vegetariano)
+        for i, sec in enumerate(sections):
+            cardapio.append({})
+            cardapio[i]['title'] = sec.find_element(By.CLASS_NAME, 'menu-section-title').text
+            cardapio[i]['pratoPrincipal'] = sec.find_element(By.CLASS_NAME, 'menu-item-name').text
+            cardapio[i]['pratosSecundarios'] = sec.find_element(By.CLASS_NAME, 'menu-item-description').text
+        
+        #Retira observações
+        for refeicao in cardapio:
+            index = refeicao['pratosSecundarios'].find('\n\n')
+            refeicao['pratosSecundarios'] = refeicao['pratosSecundarios'][:index]
+        
+        
+        embed = discord.Embed(
+            title = date,
+            description = 'Cardápio de hoje!',
+            colour = 0xffffff,
+            )
+        
+        embed.set_author(name='Unicamp')     
+        embed.set_footer(text=driver.current_url)
+        driver.quit()
+        for refeicao in cardapio:
+            pratos = refeicao['pratoPrincipal']+'\n'+refeicao['pratosSecundarios']
+            embed.add_field(name=refeicao['title'], value=pratos, inline=True)
+        await channel.send(embed=embed)
+        
 def setup(bot):
     bot.add_cog(Dates(bot))
     

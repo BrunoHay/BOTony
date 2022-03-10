@@ -21,13 +21,19 @@ class Utility(commands.Cog):
 
     @commands.command(name ='calc',help='Calculadora.')
     async def calculate(self,ctx,*expression):
+        if len(expression)==0:
+            await ctx.send('Número de argumentos inválido!')
+            return
+        
         expression = ''.join(expression)
         response = eval(expression)
         await ctx.send('Ans= {}'.format(response))
         
     @commands.command(name='report',help='Reporta algum bug ou possível melhoria para o BOT.')
     async def report(self, ctx, *msg):
+        
         if len(msg) == 0:
+            await ctx.send('Número de argumentos inválido!')
             return
         else:
             channel = self.bot.get_channel(950215017310072892)
@@ -39,6 +45,7 @@ class Utility(commands.Cog):
     @commands.command(name='repeat',help='Repete a mensagem')
     async def repeat(self, ctx,*msg):
         if len(msg) == 0:
+            await ctx.send('Número de argumentos inválido!')
             return
         else:
             msg = ' '.join(msg)
